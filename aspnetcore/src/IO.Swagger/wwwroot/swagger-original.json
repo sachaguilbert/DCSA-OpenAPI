@@ -1,0 +1,980 @@
+{
+  "openapi" : "3.0.0",
+  "info" : {
+    "title" : "DCSA OpenAPI specification for Track & Trace",
+    "description" : "API specification issued by DCSA.org",
+    "contact" : {
+      "name" : "Digital Container Shipping Association (DCSA)",
+      "url" : "https://dcsa.org",
+      "email" : "info@dcsa.org"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version" : "3.0.0"
+  },
+  "servers" : [ {
+    "url" : "/"
+  } ],
+  "tags" : [ {
+    "name" : "Notifications",
+    "description" : "Notification operations"
+  }, {
+    "name" : "Subscriptions",
+    "description" : "Subscription operations"
+  } ],
+  "paths" : {
+    "/notifications" : {
+      "get" : {
+        "tags" : [ "Notifications" ],
+        "summary" : "Find notifications.",
+        "description" : "Returns all notifications filtered by the parameters.",
+        "parameters" : [ {
+          "name" : "notificationType",
+          "in" : "query",
+          "description" : "The type of notification(s) to filter by. Default value is all notification types if no value(s) is selected. It is possible to select any combination of values by comma separating values",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/notificationTypeList"
+          }
+        }, {
+          "name" : "carrierBookingReference",
+          "in" : "query",
+          "description" : "A set of unique characters provided by carrier to identify a booking.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/carrierBookingReference"
+          }
+        }, {
+          "name" : "transportDocumentID",
+          "in" : "query",
+          "description" : "The Transport Document ID identifier is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier&apos;s receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery.\nThe Sea Waybill is a simpler document, the main difference being that it is non-negotiable.\n",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/transportDocumentID"
+          }
+        }, {
+          "name" : "equipmentReference",
+          "in" : "query",
+          "description" : "The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/equipmentReference"
+          }
+        }, {
+          "name" : "scheduleID",
+          "in" : "query",
+          "description" : "ID uniquely identifying a schedule, to filter notifications by.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/scheduleID"
+          }
+        }, {
+          "name" : "transportCallID",
+          "in" : "query",
+          "description" : "ID uniquely identifying a transport call, to filter notifications by.",
+          "required" : false,
+          "style" : "form",
+          "explode" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/transportCallID"
+          }
+        }, {
+          "name" : "limit",
+          "in" : "query",
+          "description" : "Maximum number of items to return.",
+          "required" : false,
+          "schema" : {
+            "minimum" : 1,
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 100
+          },
+          "example" : 100
+        }, {
+          "name" : "cursor",
+          "in" : "query",
+          "description" : "A server generated value to specify a specific point in a collection result, used for pagination.",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "fE9mZnNldHw9MTAmbGltaXQ9MTA="
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/notifications"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/{notificationID}" : {
+      "get" : {
+        "tags" : [ "Notifications" ],
+        "summary" : "Find notification by notificationID.",
+        "description" : "Returns notification with the specified notificationID.",
+        "parameters" : [ {
+          "name" : "notificationID",
+          "in" : "path",
+          "description" : "The ID of the notification to receive",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/notificationID"
+          },
+          "example" : "123e4567-e89b-12d3-a456-426614174000"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Successful operation",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notification-subscriptions" : {
+      "get" : {
+        "tags" : [ "Subscriptions" ],
+        "summary" : "Receive a list of your active notification subscriptions",
+        "responses" : {
+          "200" : {
+            "description" : "Returns a list of notification subscriptions",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/notificationSubscription"
+                  },
+                  "x-content-type" : "application/json"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Subscriptions" ],
+        "summary" : "Create a notification subscription",
+        "requestBody" : {
+          "description" : "Parameters used to configure the subscription. It is possible to only receive cirtain types of notifications by adding filter values to the subscription.",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/notificationSubscriptionNoID"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Subscription created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/notificationSubscription"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        },
+        "callbacks" : {
+          "notification" : {
+            "{$request.body.callbackUrl}" : {
+              "post" : {
+                "parameters" : [ {
+                  "name" : "Signature",
+                  "in" : "header",
+                  "description" : "The signature certifying the request originates from the carrier.",
+                  "required" : true,
+                  "explode" : true,
+                  "schema" : {
+                    "type" : "object",
+                    "properties" : {
+                      "keyId" : {
+                        "type" : "string",
+                        "format" : "uuid",
+                        "example" : "123e4567-e89b-12d3-a456-426614174000"
+                      },
+                      "created" : {
+                        "type" : "integer",
+                        "example" : 1591960384
+                      },
+                      "headers" : {
+                        "type" : "string",
+                        "example" : "(request-target) (created) date host"
+                      },
+                      "signature" : {
+                        "type" : "string",
+                        "example" : "aGkgZnJvbSBkZW5tYXJr"
+                      }
+                    }
+                  }
+                } ],
+                "requestBody" : {
+                  "content" : {
+                    "application/json" : {
+                      "schema" : {
+                        "$ref" : "#/components/schemas/notification"
+                      }
+                    }
+                  },
+                  "required" : true
+                },
+                "responses" : {
+                  "200" : {
+                    "description" : "Your server returns this code if it accepts the callback"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notification-subscriptions/{subscriptionID}" : {
+      "get" : {
+        "tags" : [ "Subscriptions" ],
+        "summary" : "Find notification subscription by subscription ID",
+        "parameters" : [ {
+          "name" : "subscriptionID",
+          "in" : "path",
+          "description" : "The universal unique ID of the subscription to receive.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/subscriptionID"
+          },
+          "example" : "123e4567-e89b-12d3-a456-426614174000"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Subscription returned",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/notificationSubscription"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Subscriptions" ],
+        "summary" : "Alter a notification subscription",
+        "parameters" : [ {
+          "name" : "subscriptionID",
+          "in" : "path",
+          "description" : "The universal unique ID of the subscription to receive.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/subscriptionID"
+          },
+          "example" : "123e4567-e89b-12d3-a456-426614174000"
+        } ],
+        "requestBody" : {
+          "description" : "Parameters used to configure the subscription",
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/notificationSubscription"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Subscription updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/notificationSubscription"
+                }
+              }
+            }
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "tags" : [ "Subscriptions" ],
+        "summary" : "Stop a notification subscription, using the subscription ID",
+        "parameters" : [ {
+          "name" : "subscriptionID",
+          "in" : "path",
+          "description" : "The universal unique ID of the subscription to receive.",
+          "required" : true,
+          "style" : "simple",
+          "explode" : false,
+          "schema" : {
+            "$ref" : "#/components/schemas/subscriptionID"
+          },
+          "example" : "123e4567-e89b-12d3-a456-426614174000"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Subscription stopped"
+          },
+          "default" : {
+            "description" : "Unexpected error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "notificationSubscriptionNoID" : {
+        "required" : [ "callbackUrl" ],
+        "type" : "object",
+        "description" : "The object used by the POST notification-subscriptions endpoint",
+        "allOf" : [ {
+          "type" : "object",
+          "properties" : {
+            "callbackUrl" : {
+              "$ref" : "#/components/schemas/callbackUrl"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationType" : {
+              "$ref" : "#/components/schemas/notificationTypeList"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "carrierBookingReference" : {
+              "$ref" : "#/components/schemas/carrierBookingReference"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "shippingInstructionID" : {
+              "$ref" : "#/components/schemas/shippingInstructionID"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "transportDocumentID" : {
+              "$ref" : "#/components/schemas/transportDocumentID"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "transportDocumentType" : {
+              "$ref" : "#/components/schemas/transportDocumentType"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "equipmentReference" : {
+              "$ref" : "#/components/schemas/equipmentReference"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "scheduleID" : {
+              "$ref" : "#/components/schemas/scheduleID"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "transportCallID" : {
+              "$ref" : "#/components/schemas/transportCallID"
+            }
+          }
+        } ]
+      },
+      "notificationSubscription" : {
+        "allOf" : [ {
+          "type" : "object",
+          "properties" : {
+            "subscriptionID" : {
+              "$ref" : "#/components/schemas/subscriptionID"
+            }
+          }
+        }, {
+          "$ref" : "#/components/schemas/notificationSubscriptionNoID"
+        } ]
+      },
+      "notificationTypeList" : {
+        "type" : "array",
+        "description" : "A list of notification types. Default is all notifications.",
+        "example" : [ "EQUIPMENT", "SHIPMENT", "TRANSPORT" ],
+        "items" : {
+          "$ref" : "#/components/schemas/notificationType"
+        },
+        "default" : [ "EQUIPMENT", "SHIPMENT", "TRANSPORT" ]
+      },
+      "notificationType" : {
+        "type" : "string",
+        "description" : "The Notification Type of the object - to be used as a discriminator.",
+        "nullable" : false,
+        "enum" : [ "EQUIPMENT", "SHIPMENT", "TRANSPORT" ]
+      },
+      "carrierBookingReference" : {
+        "maxLength" : 35,
+        "type" : "string",
+        "description" : "A set of unique characters provided by carrier to identify a booking.",
+        "example" : "ABC709951"
+      },
+      "transportDocumentID" : {
+        "type" : "string",
+        "description" : "The unique identifier of a transport document.",
+        "format" : "uuid",
+        "example" : "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "equipmentReference" : {
+        "maxLength" : 15,
+        "type" : "string",
+        "description" : "'The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.\nAccording to ISO 6346, a container identification code consists of a 4-letter prefix and a 7-digit number (composed of a 3-letter owner code, a category identifier, a serial number, and a check-digit). If a container does not comply with ISO 6346, it is suggested to follow Recommendation #2 “Container with non-ISO identification” from SMDG.'\n",
+        "example" : "APZU4812090"
+      },
+      "scheduleID" : {
+        "type" : "string",
+        "description" : "ID uniquely identifying a schedule",
+        "format" : "uuid",
+        "example" : "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "transportCallID" : {
+        "type" : "string",
+        "description" : "The unique identifier for a transport call",
+        "format" : "uuid",
+        "example" : "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "notifications" : {
+        "type" : "array",
+        "description" : "List of notifications for shipment journey.",
+        "items" : {
+          "$ref" : "#/components/schemas/notification"
+        }
+      },
+      "notification" : {
+        "discriminator" : {
+          "propertyName" : "NotificationType"
+        },
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/shipmentNotification"
+        }, {
+          "$ref" : "#/components/schemas/equipmentNotification"
+        }, {
+          "$ref" : "#/components/schemas/transportNotification"
+        } ]
+      },
+      "shipmentNotification" : {
+        "required" : [ "shipmentInformationTypeCode" ],
+        "type" : "object",
+        "description" : "The shipment notification entity is a specialization of the notification entity to support specification of data that only applies to a shipment notification.",
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/baseNotification"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationType" : {
+              "type" : "string",
+              "example" : "SHIPMENT",
+              "enum" : [ "SHIPMENT" ]
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "documentID" : {
+              "$ref" : "#/components/schemas/documentID"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "shipmentInformationType" : {
+              "$ref" : "#/components/schemas/shipmentInformationType"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationSubtype" : {
+              "$ref" : "#/components/schemas/documentStatus"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "reason" : {
+              "$ref" : "#/components/schemas/reason"
+            }
+          }
+        } ]
+      },
+      "baseNotification" : {
+        "required" : [ "notificationDateTime", "notificationID", "notificationType" ],
+        "type" : "object",
+        "properties" : {
+          "notificationID" : {
+            "$ref" : "#/components/schemas/notificationID"
+          },
+          "notificationType" : {
+            "$ref" : "#/components/schemas/notificationType"
+          },
+          "notificationDateTime" : {
+            "$ref" : "#/components/schemas/notificationDateTime"
+          },
+          "notificationSubtype" : {
+            "$ref" : "#/components/schemas/notificationSubtype"
+          }
+        },
+        "description" : "The Notification entity is described as a generalization of all the specific notification categories. A notification always takes place in relation to a shipment and can additionally be linked to a transport or an equipment"
+      },
+      "notificationID" : {
+        "type" : "string",
+        "description" : "The unique identifier for the notification.",
+        "format" : "uuid",
+        "nullable" : false,
+        "example" : "84db923d-2a19-4eb0-beb5-446c1ec57d34"
+      },
+      "notificationDateTime" : {
+        "type" : "string",
+        "description" : "The timestamp of the notification object",
+        "format" : "$date-time",
+        "example" : "2021-01-09T14:12:56+01:00"
+      },
+      "notificationSubtype" : {
+        "maxLength" : 4,
+        "type" : "string",
+        "description" : "The subType of the notification. Values can vary depending on notificationType"
+      },
+      "documentID" : {
+        "type" : "string",
+        "description" : "The id of the object defined by the Shipment Information Type. In some cases this is a UUID in other cases this is a string."
+      },
+      "shipmentInformationType" : {
+        "maxLength" : 3,
+        "type" : "string",
+        "description" : "The code to identify the type of information that is related to the shipment notification.",
+        "example" : "SHI",
+        "enum" : [ "BOK", "SHI", "VGM", "SRM", "TRD", "ARN" ]
+      },
+      "documentStatus" : {
+        "type" : "string",
+        "description" : "The status of the document in the process. For possible values see reference table ‘Transport Document version reference data entity’.",
+        "example" : "DRFT",
+        "enum" : [ "RECE", "DRFT", "PENA", "PENU", "REJE", "APPR", "ISSU", "SURR", "SUBM", "VOID" ]
+      },
+      "reason" : {
+        "type" : "string",
+        "description" : "Reason field in a Shipment notification. This field can be used to explain why a specific notification has been sent.",
+        "example" : "The following attributes are missing..."
+      },
+      "equipmentNotification" : {
+        "required" : [ "emptyIndicatorCode", "transportCallID" ],
+        "type" : "object",
+        "description" : "The equipment notification entity is a specialization of the notification entity to support specification of data that only applies to an equipment notification.",
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/baseNotification"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationType" : {
+              "type" : "string",
+              "example" : "EQUIPMENT",
+              "enum" : [ "EQUIPMENT" ]
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationSubtype" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "description" : "Unique identifier for Event Type Code. For equipment events this can be:\n- LOAD (Load)\n- DISC (Discharge)\n- GTIN (Gate in)\n- GTOT (Gate out)\n- STUF (Stuffing)\n- STRP (Stripping)\n",
+              "nullable" : false,
+              "example" : "LOAD",
+              "enum" : [ "LOAD", "DISC", "GTIN", "GTOT", "STUF", "STRP" ]
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "equipmentReference" : {
+              "$ref" : "#/components/schemas/equipmentReference"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "emptyIndicatorCode" : {
+              "$ref" : "#/components/schemas/emptyIndicatorCode"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "transportCallID" : {
+              "$ref" : "#/components/schemas/transportCallID"
+            }
+          }
+        } ]
+      },
+      "emptyIndicatorCode" : {
+        "type" : "string",
+        "description" : "Code to denote whether the equipment is empty or laden.",
+        "example" : "EMPTY",
+        "enum" : [ "EMPTY", "LADEN" ]
+      },
+      "transportNotification" : {
+        "required" : [ "transportCallID" ],
+        "type" : "object",
+        "description" : "The transport notification entity is a specialization of the notification entity to support specification of data that only applies to a transport notification.",
+        "allOf" : [ {
+          "$ref" : "#/components/schemas/baseNotification"
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationType" : {
+              "type" : "string",
+              "example" : "TRANSPORT",
+              "enum" : [ "TRANSPORT" ]
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "eventClassifierCode" : {
+              "$ref" : "#/components/schemas/eventClassifierCode"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "notificationSubtype" : {
+              "maxLength" : 4,
+              "type" : "string",
+              "description" : "Unique identifier for Event Type Code, for transport events this is either ARRI (Arrival) or DEPA (Departure).",
+              "nullable" : false,
+              "example" : "ARRI",
+              "enum" : [ "ARRI", "DEPA" ]
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "delayReasonCode" : {
+              "$ref" : "#/components/schemas/delayReasonCode"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "vesselScheduleChangeRemark" : {
+              "$ref" : "#/components/schemas/vesselScheduleChangeRemark"
+            }
+          }
+        }, {
+          "type" : "object",
+          "properties" : {
+            "transportCallID" : {
+              "$ref" : "#/components/schemas/transportCallID"
+            }
+          }
+        } ]
+      },
+      "eventClassifierCode" : {
+        "type" : "string",
+        "description" : "Code for the event classifier, either PLN (Planned), ACT (Actual), REQ (Requested) or EST (Estimated).",
+        "enum" : [ "PLN", "ACT", "REQ", "EST" ]
+      },
+      "delayReasonCode" : {
+        "maxLength" : 3,
+        "type" : "string",
+        "description" : "Reason code for the delay. The SMDG-Delay-Reason-Codes are used for this attribute. The code list can be found at http://www.smdg.org/smdg-code-lists/",
+        "example" : "WEA"
+      },
+      "vesselScheduleChangeRemark" : {
+        "maxLength" : 250,
+        "type" : "string",
+        "description" : "Free text information provided by the vessel operator regarding the reasons for the change in schedule and/or plans to mitigate schedule slippage.",
+        "example" : "Bad weather"
+      },
+      "error" : {
+        "required" : [ "errorDateTime", "errors", "httpMethod", "requestUri", "statusCode", "statusCodeText" ],
+        "type" : "object",
+        "properties" : {
+          "httpMethod" : {
+            "type" : "string",
+            "description" : "The HTTP request method type",
+            "example" : "POST"
+          },
+          "requestUri" : {
+            "type" : "string",
+            "description" : "The request URI.",
+            "example" : "https://dcsa.org/dcsa/tnt/v1/events"
+          },
+          "errors" : {
+            "$ref" : "#/components/schemas/errors"
+          },
+          "statusCode" : {
+            "type" : "integer",
+            "description" : "The HTTP status code",
+            "example" : 400
+          },
+          "statusCodeText" : {
+            "type" : "string",
+            "description" : "The textual representation of the response status.",
+            "example" : "Bad Request"
+          },
+          "errorDateTime" : {
+            "type" : "string",
+            "description" : "The date and time (in ISO 8601 format) the error occured.",
+            "format" : "$date-time",
+            "example" : "2019-11-12T07:41:00+08:30"
+          }
+        }
+      },
+      "errors" : {
+        "type" : "array",
+        "items" : {
+          "$ref" : "#/components/schemas/errors_inner"
+        }
+      },
+      "subscriptionID" : {
+        "type" : "string",
+        "description" : "A unique identifier for the subscription",
+        "format" : "uuid",
+        "example" : "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "callbackUrl" : {
+        "type" : "string",
+        "description" : "The endPoint where a Carrier whould send back notifications to the client",
+        "format" : "uri",
+        "example" : "https://myserver.com/send/callback/here"
+      },
+      "shippingInstructionID" : {
+        "type" : "string",
+        "description" : "The identifier for a shipping instruction provided by the carrier for system purposes.",
+        "format" : "uuid",
+        "example" : "e0559d83-00e2-438e-afd9-fdd610c1a008"
+      },
+      "transportDocumentType" : {
+        "type" : "string",
+        "description" : "Specifies the type of the transport document (a Bill of Lading (BOL) or a Sea Waybill (SWB)).",
+        "example" : "SWB",
+        "enum" : [ "BOL", "SWB" ]
+      },
+      "inline_response_200" : {
+        "discriminator" : {
+          "propertyName" : "NotificationType"
+        },
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/shipmentNotification"
+        }, {
+          "$ref" : "#/components/schemas/transportNotification"
+        }, {
+          "$ref" : "#/components/schemas/equipmentNotification"
+        } ]
+      },
+      "errors_inner" : {
+        "required" : [ "message", "reason" ],
+        "type" : "object",
+        "properties" : {
+          "reason" : {
+            "type" : "string",
+            "description" : "High level error message.",
+            "example" : "invalidQuery"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "Detailed error message.",
+            "example" : "The request did not contain one of the three required query parameters."
+          }
+        }
+      }
+    },
+    "parameters" : {
+      "notificationIDPathParam" : {
+        "name" : "notificationID",
+        "in" : "path",
+        "description" : "The ID of the notification to receive",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/notificationID"
+        },
+        "example" : "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "subscriptionIDPathParam" : {
+        "name" : "subscriptionID",
+        "in" : "path",
+        "description" : "The universal unique ID of the subscription to receive.",
+        "required" : true,
+        "style" : "simple",
+        "explode" : false,
+        "schema" : {
+          "$ref" : "#/components/schemas/subscriptionID"
+        },
+        "example" : "123e4567-e89b-12d3-a456-426614174000"
+      },
+      "carrierBookingReferenceQueryParam" : {
+        "name" : "carrierBookingReference",
+        "in" : "query",
+        "description" : "A set of unique characters provided by carrier to identify a booking.",
+        "required" : false,
+        "style" : "form",
+        "explode" : true,
+        "schema" : {
+          "$ref" : "#/components/schemas/carrierBookingReference"
+        }
+      },
+      "equipmentReferenceQueryParam" : {
+        "name" : "equipmentReference",
+        "in" : "query",
+        "description" : "The unique identifier for the equipment, which should follow the BIC ISO Container Identification Number where possible.",
+        "required" : false,
+        "style" : "form",
+        "explode" : true,
+        "schema" : {
+          "$ref" : "#/components/schemas/equipmentReference"
+        }
+      },
+      "notificationTypeQueryParam" : {
+        "name" : "notificationType",
+        "in" : "query",
+        "description" : "The type of notification(s) to filter by. Default value is all notification types if no value(s) is selected. It is possible to select any combination of values by comma separating values",
+        "required" : false,
+        "style" : "form",
+        "explode" : true,
+        "schema" : {
+          "$ref" : "#/components/schemas/notificationTypeList"
+        }
+      },
+      "scheduleIDQueryParam" : {
+        "name" : "scheduleID",
+        "in" : "query",
+        "description" : "ID uniquely identifying a schedule, to filter notifications by.",
+        "required" : false,
+        "style" : "form",
+        "explode" : true,
+        "schema" : {
+          "$ref" : "#/components/schemas/scheduleID"
+        }
+      },
+      "transportCallIDQueryParam" : {
+        "name" : "transportCallID",
+        "in" : "query",
+        "description" : "ID uniquely identifying a transport call, to filter notifications by.",
+        "required" : false,
+        "style" : "form",
+        "explode" : true,
+        "schema" : {
+          "$ref" : "#/components/schemas/transportCallID"
+        }
+      },
+      "transportDocumentIDQueryParam" : {
+        "name" : "transportDocumentID",
+        "in" : "query",
+        "description" : "The Transport Document ID identifier is an identifier that links to a shipment, i.e. a Bill of Lading or a Sea Waybill. A bill of lading is the document of title to the goods issued to the customer which confirms the carrier&apos;s receipt of the cargo from the customer, acknowledging goods being shipped and specifying the terms of delivery.\nThe Sea Waybill is a simpler document, the main difference being that it is non-negotiable.\n",
+        "required" : false,
+        "style" : "form",
+        "explode" : true,
+        "schema" : {
+          "$ref" : "#/components/schemas/transportDocumentID"
+        }
+      }
+    }
+  }
+}
